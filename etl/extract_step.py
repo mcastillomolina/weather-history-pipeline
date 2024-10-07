@@ -21,6 +21,25 @@ def create_request_session():
     return session
 
 
+def fetch_data(session, url):
+    '''
+    This function fetches data from a given URL using the provided session.
+    It handles timeouts and request exceptions.
+    '''
+    try:
+        logging.info(f'Fetching data from {url}')
+        response = session.get(url)
+        response.raise_for_status()
+        logging.debug(f'Response status code: {response.status_code}')
+        return response.json()
+    except requests.exceptions.Timeout as e:
+        logging.error(f'Timeout error occurred: {e}')
+        time.sleep(30)
+        raise
+    except requests.exceptions.RequestException as e:
+        logging.error(f'A request error occurred: {e}')
+        raise
+
 def extract_data(api_url, station_id):
     '''
     This function extracts weather data for a station id from the weather API.
@@ -32,31 +51,20 @@ def extract_data(api_url, station_id):
     if not station_id:
         raise ValueError('Station ID is required')
 
+    station_endpoint = f'{api_url}/stations/{station_id}'
     observations_endpoint = f'{api_url}/stations/{station_id}/observations'
 
-    session = create_request_session()
-    try:
-        logging.info(f'Extracting data from {observations_endpoint}')
-        observations = session.get(observations_endpoint)
-        observations.raise_for_status()
-        logging.debug(f'Response status code: {observations.status_code}')
-        observations_data = observations.json()['features']
-        logging.debug(f'Observations data: {observations_data}')
-        return observations_data
-    except requests.exceptions.Timeout as e:
-        logging.error(f'Timeout error occured: {e}')
-        time.sleep(30)
-        raise
-    except requests.exceptions.RequestException as e:
-        logging.error(f'A request error occured: {e}')
-        raise
-    finally:
-        session.close()
+    with create_request_session() as session:
+        station_data = fetch_data(session, station_endpoint).get('properties', {})
+        observations_data = fetch_data(session, observations_endpoint).get('features', [])
+
+    return station_data, observations_data
 
 if __name__ == '__main__':
     api_url = 'https://api.weather.gov'
     station_id = '000PG'
-    data = extract_data(api_url, station_id)
-    logging.info(f'Extracted data: {data}')
+    station_data, observations_data = extract_data(api_url, station_id)
+    logging.info(f'Station data: {station_data}')
+    logging.info(f'Observation data: {observations_data[0]}')
 
  
