@@ -37,15 +37,17 @@ Build the Docker Images:
 
 ```docker-compose build```
 
-Start the Docker Containers:
+Start the Docker Containers: 
 
 ```docker-compose up```
+
+et voilá! The pipeline is running! 
 
 Check the Logs:
 
 ```docker logs weather-pipeline```
 
-These commands will spin up the database container (mysql_db) and the pipeline container (weather-pipeline). The pipeline container will execute the pipeline once and then turn off. To re-run it, just re-start the pipeline container.
+These commands will spin up the database container (mysql_db) and the pipeline container (weather-pipeline). The pipeline container will execute the pipeline once and then turn off. To run it again, just re-start the pipeline container. You can re-run it as many times as you want!
 
 Example logs of multiple runs
 ![alt text](images/image-2.png)
