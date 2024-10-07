@@ -31,7 +31,8 @@ def transform_step(station_data, observations_data, lookback_days=7):
         if obs_timestamp < seven_days_ago.isoformat():
             # If observation older than seven days, skip
             continue
-        
+
+        obs_timestamp = datetime.datetime.fromisoformat(obs_timestamp)
         latitude = geometry['coordinates'][1]
         longitude = geometry['coordinates'][0]
         temperature = round(properties.get('temperature')['value'], 2)
