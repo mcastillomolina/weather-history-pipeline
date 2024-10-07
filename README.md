@@ -1,6 +1,28 @@
 # Weather historical data ETL 
 This documentation provides a guide on how to set up and run the Weather ETL pipeline using Docker Compose.
 
+### Structure
+
+The main file is the `pipeline.py` file. The code for the Extraction, transformation and load of data can be found in the [etl/](etl/) directory.
+
+At a high level, the structure of this repository is:
+
+```
+weather-history-pipeline/
+│
+├── etl/
+│   ├── extract_step.py
+│   ├── transform_step.py
+│   └── load_step.py
+├── metrics_sql_queries/
+│   ├── avg_temperature.sql
+│   ├── max_wind_speed_change.sql
+│
+├── pipeline.py
+└── README.md
+└── docker-files
+```
+
 ### Prerequisites
 Docker: Ensure Docker is installed on your machine.
 
@@ -26,26 +48,26 @@ Check the Logs:
 These commands will spin up the database container (mysql_db) and the pipeline container (weather-pipeline). The pipeline container will execute the pipeline once and then turn off. To re-run it, just re-start the pipeline container.
 
 Example logs of multiple runs
-![alt text](image-2.png)
+![alt text](images/image-2.png)
 
 If using the docker desktop, you can hit the start button with the container selected to re-run the pipeline container
-![alt text](image-3.png)
+![alt text](images/image-3.png)
 
 ## Results
 The pipeline will create and populate the table `weather-historical` in the database `weather-forecast`
-![alt text](image.png)
-![alt text](image-1.png)
+![alt text](images/image.png)
+![alt text](images/image-1.png)
 
 As per the last run of the queries, executed on the morning of Monday October 7th.
 ### Average observed temperature for last week(Mon-Sun). 
 Result = 26.899083
 
-![alt text](image-4.png)
+![alt text](images/image-4.png)
 
 ### Maximum wind speed change between two consecutive observations in the last 7 days.
 Result = 8.1
 
-![alt text](image-5.png)
+![alt text](images/image-5.png)
 
 ### Queries
 The queries required to find the average observed temperature and maximum wind speed change can be found in the `metrics_sql_queries/` directory. 
