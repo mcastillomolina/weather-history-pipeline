@@ -20,7 +20,7 @@ def transform_step(station_data, observations_data, lookback_days=7):
     station_timezone = station_data['timeZone']
     
     seven_days_ago = datetime.datetime.now() - datetime.timedelta(days=lookback_days)
-    logging.info(f'Filtering observations data for the last {lookback_days} days')
+    logging.info(f'Filtering observations from {seven_days_ago} to present')
 
     prep_data = []
 
@@ -35,9 +35,15 @@ def transform_step(station_data, observations_data, lookback_days=7):
         obs_timestamp = datetime.datetime.fromisoformat(obs_timestamp)
         latitude = geometry['coordinates'][1]
         longitude = geometry['coordinates'][0]
-        temperature = round(properties.get('temperature')['value'], 2)
-        wind_speed = round(properties.get('windSpeed')['value'], 2)
-        humidity = round(properties.get('relativeHumidity')['value'], 2)
+
+        temp = properties['temperature'].get('value')
+        temperature = round(temp, 2) if temp else None
+
+        ws = properties['windSpeed'].get('value')
+        wind_speed = round(ws, 2) if ws else None
+        
+        hum = properties['relativeHumidity'].get('value')
+        humidity = round(hum, 2) if hum else None
 
         prep_data.append((station_id, station_name, station_timezone, latitude, longitude, obs_timestamp, temperature, wind_speed, humidity))
 

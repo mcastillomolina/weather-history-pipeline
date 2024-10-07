@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  mysql_db:
+    image: mysql:8.0
+    container_name: mysql_db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: weather-forecast
+      MYSQL_USER: weather-etl
+      MYSQL_PASSWORD: weather-etl
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  pipeline:
+    build: .
+    container_name: weather-pipeline
+    depends_on:
+      mysql_db:
+        condition: service_healthy
+    environment:
+      - MYSQL_HOST=mysql_db
+      - MYSQL_DATABASE=weather-forecast
+      - MYSQL_USER=weather-etl
+      - MYSQL_PASSWORD=weather-etl
+      - LOG_LEVEL=INFO 
+      - WEATHER_API_URL=https://api.weather.gov
+      - STATION_ID=000PG
+    volumes:
+      - .:/app
+
+volumes:
+  mysql_data:

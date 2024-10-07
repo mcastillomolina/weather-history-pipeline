@@ -40,7 +40,7 @@ def fetch_data(session, url):
         logging.error(f'A request error occurred: {e}')
         raise
 
-def extract_data(api_url, station_id):
+def extract_step(api_url, station_id):
     '''
     This function extracts weather data for a station id from the weather API.
     A station_id is required to get the data.
@@ -58,12 +58,13 @@ def extract_data(api_url, station_id):
         station_data = fetch_data(session, station_endpoint).get('properties', {})
         observations_data = fetch_data(session, observations_endpoint).get('features', [])
 
+    logging.info(f'Extracted data for station {station_id}, lenght of observations: {len(observations_data)}')
     return station_data, observations_data
 
 if __name__ == '__main__':
     api_url = 'https://api.weather.gov'
     station_id = '000PG'
-    station_data, observations_data = extract_data(api_url, station_id)
+    station_data, observations_data = extract_step(api_url, station_id)
     logging.info(f'Station data: {station_data}')
     logging.info(f'Observation data: {observations_data[0]}')
 

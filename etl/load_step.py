@@ -34,6 +34,24 @@ def load_step(data):
     connection = get_connection(connection_config)
     cursor = connection.cursor()
 
+    create_table_query = '''
+    CREATE TABLE IF NOT EXISTS weather_historical (
+        station_id VARCHAR(10) NOT NULL,
+        station_name VARCHAR(255),
+        station_timezone VARCHAR(255),
+        latitude DECIMAL(10, 8),
+        longitude DECIMAL(11, 8),
+        obs_timestamp DATETIME,
+        temperature DECIMAL(5, 2),
+        wind_speed DECIMAL(5, 2),
+        humidity DECIMAL(5, 2),
+        PRIMARY KEY (station_id, obs_timestamp)
+    )
+    ''' 
+
+    cursor.execute(create_table_query)
+    logging.info('Created weather_historical table')
+
     upsert_query = '''
     INSERT INTO weather_historical (station_id, station_name, station_timezone, latitude, longitude, obs_timestamp, temperature, wind_speed, humidity)
     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
@@ -42,7 +60,7 @@ def load_step(data):
     station_timezone=VALUES(station_timezone),
     latitude=VALUES(latitude),
     longitude=VALUES(longitude),
-    observation_ts=VALUES(obs_timestamp),
+    obs_timestamp=VALUES(obs_timestamp),
     temperature=VALUES(temperature),
     wind_speed=VALUES(wind_speed),
     humidity=VALUES(humidity)
